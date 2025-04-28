@@ -60,22 +60,9 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
     # Form the av1an command.
     # ? Does Av1an make sense? FFMpeg would work too, and not require installing Av1an + it's deps.
     av1an_cmd: list[str] = [
-        "ffmpeg",
-        "-i",
-        file_path,
-        "-map",
-        "0:v:0",
-        "-pix_fmt",
-        "yuv420p10le",
-        "-f",
-        "yuv4mpegpipe",
-        "-strict",
-        "-1",
-        "-",
-        "|",
         "SvtAv1EncApp", 
         "-i",
-        "stdin",
+        file_path,
         "-b",
         f"{file_path}.{iteration}.av1an",
         svt_options
@@ -109,17 +96,27 @@ def main() -> None:
         directories.append(user_input_folder)
 
     for directory in directories:
+        length = len(os.listdir(directory))
         for file_path in glob.glob(os.path.join(os.getcwd(), directory, "*")):
-            if any(file_path.endswith(ext) for ext in file_extensions):
+            done = False
+            if any(file_path.endswith(ext) for ext in file_extensions) and done == False:
                 iter = 0
                 for command in svt_settings:
-                    iter += 1
-                    av1an(
-                        svt_options=svt_settings[command].replace('"', ""),
-                        workers=config.getint("av1an-settings", "AV1AN_WORKERS"),
-                        file_path=file_path,
-                        iteration=iter,
-                    )
+                    if iter <= length:
+                        iter += 1
+                        av1an(
+                            svt_options=svt_settings[command].replace('"', ""),
+                            workers=config.getint("av1an-settings", "AV1AN_WORKERS"),
+                            file_path=file_path,
+                            iteration=iter,
+                        )
+                    else:
+                        done = True
+                        break
+            else:
+                break
 
-
-main()
+if __name__ == "__main__":
+    main()
+else:
+    print("main not detected")
