@@ -81,9 +81,6 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
     ]
 
     # If the user has set a custom number of workers, add it to the command.
-    if workers != 0:
-        av1an_cmd.append("--workers")
-        av1an_cmd.append(str(workers))
 
     # Add the new svt-av1 binary to the $PATH
     # Wished Av1an allowed for the user to set the binary path.
