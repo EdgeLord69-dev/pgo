@@ -36,7 +36,6 @@ def get_objective_folder() -> str | None:
 
 
 # video-input folder
-user_input_folder: str = f"{os.getcwd()}/video-input"
 
 # objective folder
 objective_folder: str | None = get_objective_folder()
@@ -60,12 +59,26 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
     # Form the av1an command.
     # ? Does Av1an make sense? FFMpeg would work too, and not require installing Av1an + it's deps.
     av1an_cmd: list[str] = [
-        "SvtAv1EncApp", 
+        "ffmpeg",
         "-i",
         file_path,
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "yuv420p10le",
+        "-f",
+        "yuv4mpegpipe",
+        "-strict",
+        "-1",
+        "-",
+        "|",
+        "SvtAv1EncApp", 
+        "-i",
+        "stdin",
         "-b",
         f"{file_path}.{iteration}.av1an",
         svt_options
+    ]
     ]
 
     # If the user has set a custom number of workers, add it to the command.
@@ -89,11 +102,10 @@ def main() -> None:
 
     if objective_folder is None:
         # If objective folder is not found, use the user input folder.
-        directories.append(user_input_folder)
+       print("Download XIPH Test archives")
     else:
         # If objective folder is found, use it, along with the user input folder.
         directories.append(objective_folder)
-        directories.append(user_input_folder)
 
     for directory in directories:
         length = len(os.listdir(directory))
