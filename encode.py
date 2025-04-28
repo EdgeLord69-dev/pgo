@@ -76,7 +76,7 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
         "-i",
         "stdin",
         "-b",
-        f"{file_path}.{iteration}.av1an",
+        f"{file_path}.{iteration}.ivf",
         svt_options
     ]
 
