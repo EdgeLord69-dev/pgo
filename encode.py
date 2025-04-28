@@ -79,7 +79,6 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
         f"{file_path}.{iteration}.av1an",
         svt_options
     ]
-    ]
 
     # If the user has set a custom number of workers, add it to the command.
     if workers != 0:
