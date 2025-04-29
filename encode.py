@@ -89,7 +89,7 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
     env["PATH"] = f"{args.svt_repo}/Bin/Release:{env['PATH']}"
 
     ffmpeg = subprocess.run(av1an_cmd, env=env, stdout=subprocess.PIPE)
-    subprocess.check_output(SvtArgs, stdin=ffmpeg.stdout)
+    subprocess.run(SvtArgs, stdin=ffmpeg.stdout)
     
     if os.path.exists(f"{file_path}.{iteration}.av1an"):
         os.remove(f"{file_path}.{iteration}.av1an")
