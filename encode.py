@@ -70,15 +70,16 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
         "yuv4mpegpipe",
         "-strict",
         "-1",
-        "-"
-    ]
-    SvtArgs = [
+        "-",
+        "|",
         "SvtAv1EncApp", 
         "-i",
         "stdin",
         "-b",
         f"{file_path}.{iteration}.av1an",
         svt_options
+    ]
+    SvtArgs = [
     ]
 
     # If the user has set a custom number of workers, add it to the command.
