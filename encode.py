@@ -58,29 +58,7 @@ def random_string() -> str:
 def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> None:
     # Form the av1an command.
     # ? Does Av1an make sense? FFMpeg would work too, and not require installing Av1an + it's deps.
-    av1an_cmd: list[str] = [
-        "ffmpeg",
-        "-i",
-        file_path,
-        "-map",
-        "0:v:0",
-        "-pix_fmt",
-        "yuv420p10le",
-        "-f",
-        "yuv4mpegpipe",
-        "-strict",
-        "-1",
-        "-",
-        "|",
-        "SvtAv1EncApp", 
-        "-i",
-        "stdin",
-        "-b",
-        f"{file_path}.{iteration}.av1an",
-        svt_options
-    ]
-    SvtArgs = [
-    ]
+    av1an_cmd = f"ffmpeg -i {file_path} -map 0:v:0 -f yuv4mpegpipe -strict -1 - | SvtAv1EncApp -I stdin -b {file_path}.{iteration}.ivf {svt_options}"
 
     # If the user has set a custom number of workers, add it to the command.
 
@@ -89,11 +67,10 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
     env: dict[str, str] = os.environ.copy()
     env["PATH"] = f"{args.svt_repo}/Bin/Release:{env['PATH']}"
 
-    ffmpeg = subprocess.run(av1an_cmd, env=env, stdout=subprocess.PIPE)
-    subprocess.run(SvtArgs, stdin=ffmpeg.stdout)
+    subprocess.run(av1an_cmd, env=env, shell=True)
     
-    if os.path.exists(f"{file_path}.{iteration}.av1an"):
-        os.remove(f"{file_path}.{iteration}.av1an")
+    if os.path.exists(f"{file_path}.{iteration}.ivf"):
+        os.remove(f"{file_path}.{iteration}.ivf")
 
 
 def main() -> None:
