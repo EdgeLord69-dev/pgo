@@ -59,11 +59,25 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
     # Form the av1an command.
     # ? Does Av1an make sense? FFMpeg would work too, and not require installing Av1an + it's deps.
     av1an_cmd: list[str] = [
-        "SvtAv1EncApp", 
+        "ffmpeg",
         "-i",
         file_path,
+        "-map",
+        "0:v:0",
+        "-pix_fmt",
+        "yuv420p10le",
+        "-f",
+        "yuv4mpegpipe",
+        "-strict",
+        "-1",
+        "-"
+    ]
+    SvtArgs = [
+        "SvtAv1EncApp", 
+        "-i",
+        "stdin",
         "-b",
-        f"{file_path}.{iteration}.ivf",
+        f"{file_path}.{iteration}.av1an",
         svt_options
     ]
 
@@ -74,7 +88,9 @@ def av1an(svt_options: str, workers: int, file_path: str, iteration: int) -> Non
     env: dict[str, str] = os.environ.copy()
     env["PATH"] = f"{args.svt_repo}/Bin/Release:{env['PATH']}"
 
-    subprocess.run(av1an_cmd, env=env, shell=True)
+    ffmpeg = subprocess.run(av1an_cmd, env=env, stdout=subprocess.PIPE)
+    subprocess.check_output(SvtArgs, stdin=ffmpeg.stdout)
+    
     if os.path.exists(f"{file_path}.{iteration}.av1an"):
         os.remove(f"{file_path}.{iteration}.av1an")
 
